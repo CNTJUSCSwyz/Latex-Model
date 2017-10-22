@@ -1,0 +1,81 @@
+\documentclass[UTF8]{article}
+
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{CJK,CJKnumb,CJKulem}
+%\hypersetup{colorlinks=true,CJKbookmarks=true}
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={imread},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\color{black!40}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},
+}
+
+\title{The Report of Image Processing\\ First Homework\\}
+\author{Wang Yunzheng \\3015218157\\}
+\date{2017/9/19}
+
+\begin{document}
+\maketitle
+
+
+\newpage
+\begin{CJK*}{GBK}{song}
+        题目1. 使用matlab写一个函数，img = generateFigure(imgW,imgH)，其作用为产生一幅的彩色图像，图像中用红色显示 [0,2*pi] 的正弦波，用绿色显示[0,2*pi]的余弦波，蓝色显示[0,2*pi]的y=$x^2$图像。
+\end{CJK*}
+\begin{CJK*}{GBK}{song}
+        matlab报错“带有下标的赋值维度不匹配。”为了让函数y=sin(x),y=cos(x)为正整数，故在之前的函数结尾加了个1，导致此错误。解决办法：矩阵y3定义时多加一行。
+\end{CJK*}
+
+
+%To list your MATLAB code:
+\begin{lstlisting}
+% a function to print an image of three curves
+function [ img ] = generateFigure( imgW,imgH )
+%imgW is the width of the figure,
+%imgH is the height of the figure
+y1 = zeros(imgH,imgW);
+y2 = zeros(imgH,imgW);
+y3 = zeros(imgH+1,imgW);
+for i=1:imgW
+    y1(int16(-imgH/2*sin(i*2*pi/imgW)+imgH/2+1),i)=255;
+end
+for i=1:imgW
+    y2(int16(-imgH/2*cos(i*2*pi/imgW)+imgH/2+1),i)=255;
+end
+for i=1:imgW
+    y3(int16((-imgH/2/40)*((i*2*pi/imgW)*(i*2*pi/imgW))+imgH/2+1),i)=255;
+end
+img(:,:,1)=y1;
+img(:,:,2)=y2;
+img(:,:,3)=y3;
+end
+
+
+%imagesc(img);
+\end{lstlisting}
+\begin{CJK*}{GBK}{song}
+        向命令行输入
+        \begin{lstlisting}
+            img=generateFigure(500,300)
+            imshow(img)
+        \end{lstlisting}
+        得到如下图:\\
+\end{CJK*}
+\centerline{\includegraphics{F:/lines.jpg}}
+
+\end{document}
