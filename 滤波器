@@ -1,0 +1,295 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\usepackage{xcolor}
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={imread},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\color{black!40}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},
+}
+
+\begin{document}
+\begin{titlepage}
+
+\begin{center}
+
+
+% Upper part of the page
+\includegraphics[width=0.8\textwidth]{3.jpg}\vspace{2cm}\\[1cm]
+
+\textsc{\fontsize{26pt}{0.8} {\LaTeX} \begin{LARGE}  用matlab实现滤波器\end{LARGE}}\\[0.5cm]
+\textsc{\fontsize{20pt}{0.3}  ——图像处理作业报告 \vspace{3cm}}\\[2cm]
+\textsc{\LARGE 软件工程4班\\3015218157 \vspace{0.5cm}\\王允政\vspace{1cm}}\\[0.5cm]
+
+
+% Bottom of the page
+{\LARGE \today}
+
+\end{center}
+
+\end{titlepage}
+\setcounter{page}{0}
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+\section{目的}
+\paragraph{}
+用matlab实现一些常见滤波器：包括均值滤波和顺序统计滤波器
+\section{均值滤波器}
+\subsection{算数均值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+function d=avg_filter(x,n)
+a(1:n,1:n)=1;
+[height, width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+    for j=1:width-n+1
+        c=x1(i:i+(n-1),j:j+(n-1)).*a;
+        s=sum(sum(c));
+        x2(i+(n-1)/2,j+(n-1)/2)=s/(n*n);
+    end
+end
+d=uint8(x2);
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/average.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/average1.png}}
+\newpage
+\subsection{几何均值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+function d=gmid_filter(x,n)
+a(1:n,1:n)=1;
+[height, width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+    for j=1:width-n+1
+        c=x1(i:i+(n-1),j:j+(n-1)).*a;
+        s=prod(prod(c));
+        x2(i+(n-1)/2,j+(n-1)/2)=s.^(1/n).^(1/n);
+    end
+end
+d=uint8(x2);
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/average.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/gfliter.png}}
+\newpage
+\subsection{谐波均值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+function d=xie_filter(x,n)
+a(1:n,1:n)=1;
+[height,width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+for j=1:width-n+1
+    c=x1(i:i+(n-1),j:j+(n-1)).*a;
+    s=sum(sum(1./c));
+    x2(i+(n-1)/2,j+(n-1)/2)=(n*n)/s;
+end
+end
+d=uint8(x2);
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/average.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/xie.png}}
+\newpage
+\subsection{逆谐波均值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+function d=nixie_filter(x,n,h)
+a(1:n,1:n)=1;
+[height,width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+for j=1:width-n+1
+    c=x1(i:i+(n-1),j:j+(n-1)).*a;
+    s1=sum(sum(power(c,h+1)));
+    s2=sum(sum(power(c,h)));
+    x2(i+(n-1)/2,j+(n-1)/2)=s1/s2;
+end
+end
+d=uint8(x2);
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/average.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/nixie.png}}
+\newpage
+\section{顺序统计滤波器}
+\subsection{中值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+ function d=mid_filter(x,n)
+[height, width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+    for j=1:width-n+1
+        c=x1(i:i+(n-1),j:j+(n-1));
+        e=c(1,:);
+        for u=2:n
+            e=[e,c(u,:)];
+        end
+        mm=median(e);
+        x2(i+(n-1)/2,j+(n-1)/2)=mm;
+    end
+end
+d=uint8(x2);
+
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/zhong.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/zhong1.png}}
+\newpage
+\subsection{最大值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+ function d=max_filter(x,n)
+[height, width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+    for j=1:width-n+1
+        c=x1(i:i+(n-1),j:j+(n-1));
+        e=c(1,:);
+        for u=2:n
+            e=[e,c(u,:)];
+        end
+        mm=max(e);
+        x2(i+(n-1)/2,j+(n-1)/2)=mm;
+    end
+end
+d=uint8(x2);
+
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/max.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/max_order.png}}
+\newpage
+\subsection{最小值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+ function d=min_filter(x,n)
+[height, width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+    for j=1:width-n+1
+        c=x1(i:i+(n-1),j:j+(n-1));
+        e=c(1,:);
+        for u=2:n
+            e=[e,c(u,:)];
+        end
+        mm=min(e);
+        x2(i+(n-1)/2,j+(n-1)/2)=mm;
+    end
+end
+d=uint8(x2);
+
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/min.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/min_order.png}}
+\newpage
+\subsection{中点滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+ function d=middle_filter(x,n)
+[height, width]=size(x);
+x1=double(x);
+x2=x1;
+for i=1:height-n+1
+    for j=1:width-n+1
+        c=x1(i:i+(n-1),j:j+(n-1));
+        e=c(1,:);
+        for u=2:n
+            e=[e,c(u,:)];
+        end
+        mm=0.5*(max(e)+min(e));
+        x2(i+(n-1)/2,j+(n-1)/2)=mm;
+    end
+end
+d=uint8(x2);
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/zhong.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/middle.png}}
+\newpage
+\subsection{修正后的阿尔法均值滤波器}
+\paragraph{代码}
+：
+\begin{lstlisting}
+function f = alphatrim(g,m,n,d)
+g1=rgb2gray(g);
+f = imfilter(g1,ones(m,n),'symmetric');
+for k = 1:d/2:1
+    f = imsubtract(f,ordfilt2(g1,k,ones(m,n),'symmetric'));
+end
+for k = (m*n - (d/2) + 1):m*n:1
+    f = imsubtract(f,ordfilt2(g1,k,ones(m,n),'symmetric'));
+end
+f = f/(m*n - d);
+\end{lstlisting}
+\paragraph{结果}
+：\\
+原始图像为：\\
+\centerline{\includegraphics{F:/mix.png}}
+滤波后的图像为：\\
+\centerline{\includegraphics[width=1\textwidth]{F:/1/mix.png}}
+\section{总结}
+实现了一些简单的滤波函数，虽然说一些函数matlab已经有预先封装好的，但自己写一遍感觉对整体图像还原算法的了解又加深了。
+\end{document}
+\newpage
